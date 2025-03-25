@@ -136,13 +136,15 @@ void update_game() {
 
     // Manger le fruit
     if (snake[0].x == fruit.x && snake[0].y == fruit.y) {
-        snake_length++;
-        score += 10;  // Incrémentation du score
-        fruit.x = rand() % (WIDTH / TILE_SIZE);
-        fruit.y = rand() % (HEIGHT / TILE_SIZE);
+    snake_length++;
+    snake[snake_length - 1] = snake[snake_length - 2];  // Correction ici
 
-        update_score_texture();  // Mettre à jour l'affichage du score
-    }
+    score += 10;
+    fruit.x = rand() % (WIDTH / TILE_SIZE);
+    fruit.y = rand() % (HEIGHT / TILE_SIZE);
+
+    update_score_texture();
+  }
 }
 
 int main() {
@@ -177,4 +179,3 @@ int main() {
 
     return 0;
 }
-
