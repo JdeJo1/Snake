@@ -93,10 +93,10 @@ void handle_input() {
             running = false;
         } else if (event.type == SDL_KEYDOWN) {
             switch (event.key.keysym.sym) {
-                case SDLK_z: if (direction != 's') direction = 'z'; break;
-                case SDLK_s: if (direction != 'z') direction = 's'; break;
-                case SDLK_q: if (direction != 'd') direction = 'q'; break;
-                case SDLK_d: if (direction != 'q') direction = 'd'; break;
+                case SDLK_UP: if (direction != 'u') direction = 'u'; break;
+                case SDLK_DOWN: if (direction != 'd') direction = 'd'; break;
+                case SDLK_LEFT: if (direction != 'l') direction = 'l'; break;
+                case SDLK_RIGHT: if (direction != 'r') direction = 'r'; break;
             }
         } else if (event.type == SDL_WINDOWEVENT) {
             if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
@@ -116,10 +116,10 @@ void update_game() {
     }
 
     // Déplacer la tête
-    if (direction == 'z') snake[0].y--;
-    if (direction == 's') snake[0].y++;
-    if (direction == 'q') snake[0].x--;
-    if (direction == 'd') snake[0].x++;
+    if (direction == 'u') snake[0].y--;
+    if (direction == 'd') snake[0].y++;
+    if (direction == 'l') snake[0].x--;
+    if (direction == 'r') snake[0].x++;
 
     // Vérifier collisions avec les murs
     if (snake[0].x < 0 || snake[0].x >= WIDTH / TILE_SIZE ||
