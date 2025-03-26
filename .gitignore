@@ -1,0 +1,9 @@
+# Fichiers binaires et exécutables
+snake
+*.o
+*.out
+
+# Dossiers spécifiques aux IDE
+.vscode/
+.idea/
+*.code-workspace
