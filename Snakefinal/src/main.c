@@ -7,8 +7,8 @@
 
 #define TILE_SIZE 20
 #define SNAKE_MAX_LENGTH 100
-#define OBSTACLE_INTERVAL 5000  // 5 secondes
-#define MAX_OBSTACLES 10
+#define OBSTACLE_INTERVAL 5000
+#define MAX_OBSTACLES 20
 
 // Structure des points
 typedef struct {
@@ -25,8 +25,8 @@ bool running = true;
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
-int WIDTH = 640;
-int HEIGHT = 480;
+int WIDTH = 920;
+int HEIGHT = 920;
 
 // Variables pour l'affichage du score
 TTF_Font* font = NULL;
@@ -39,15 +39,37 @@ SDL_Texture* fruitTexture = NULL;
 SDL_Texture* obstacleTexture = NULL;
 Uint32 last_obstacle_time = 0;
 
+// Variable pour l'image du logo
+SDL_Texture* logoTexture = NULL;
+
+// Fonction pour charger l'image du logo
+void load_logo_image() {
+    logoTexture = IMG_LoadTexture(renderer, "Snakefinal/cosmetiques/logosnake.png");
+    if (!logoTexture) {
+        printf("Erreur chargement image logo : %s\n", IMG_GetError());
+    }
+}
 // Fonction pour afficher l'écran d'accueil
 void show_main_menu() {
     SDL_Event event;
     bool menu_running = true;
 
+    // Charger l'image du logo
+    load_logo_image();
+
     // Affichage de l'écran d'accueil
     while (menu_running) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Fond noir
         SDL_RenderClear(renderer);
+
+        // Afficher l'image du logo (par exemple, au centre de l'écran)
+        if (logoTexture) {
+            int logoWidth, logoHeight;
+            SDL_QueryTexture(logoTexture, NULL, NULL, &logoWidth, &logoHeight); // Obtenir les dimensions de l'image
+
+            SDL_Rect logoRect = {WIDTH / 2 - logoWidth / 2, HEIGHT / 4 - logoHeight / 2, logoWidth, logoHeight};
+            SDL_RenderCopy(renderer, logoTexture, NULL, &logoRect);
+        }
 
         // Afficher le message "Appuyez sur ENTER pour commencer"
         SDL_Surface* textSurface = TTF_RenderText_Solid(font, "Appuyez sur ENTER pour commencer", textColor);
@@ -75,7 +97,14 @@ void show_main_menu() {
             }
         }
     }
+
+    // Libérer la texture du logo après utilisation
+    if (logoTexture) {
+        SDL_DestroyTexture(logoTexture);
+    }
 }
+
+
 
 // Initialisation de SDL et SDL_ttf
 void init_SDL() {
@@ -83,11 +112,11 @@ void init_SDL() {
     TTF_Init(); // Initialisation de SDL_ttf
     IMG_Init(IMG_INIT_PNG); // Initialisation de SDL_image
 
-    window = SDL_CreateWindow("Snake SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow("Snake SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // Charger la police
-    font = TTF_OpenFont("cosmetiques/Arial.ttf", 24);
+    font = TTF_OpenFont("Snakefinal/cosmetiques/Arial.ttf", 24);
     if (!font) {
         printf("Erreur chargement police : %s\n", TTF_GetError());
         running = false;
@@ -96,7 +125,7 @@ void init_SDL() {
 
 // Charger l'image du fruit
 void load_fruit_image() {
-    fruitTexture = IMG_LoadTexture(renderer, "cosmetiques/fruit.png");
+    fruitTexture = IMG_LoadTexture(renderer, "Snakefinal/cosmetiques/fruit.png");
     if (!fruitTexture) {
         printf("Erreur chargement image fruit : %s\n", IMG_GetError());
     }
@@ -104,7 +133,7 @@ void load_fruit_image() {
 
 // Charger l'image de l'obstacle
 void load_obstacle_image() {
-    obstacleTexture = IMG_LoadTexture(renderer, "cosmetiques/obstacle.png");
+    obstacleTexture = IMG_LoadTexture(renderer, "Snakefinal/cosmetiques/obstacle.png");
     if (!obstacleTexture) {
         printf("Erreur chargement image obstacle : %s\n", IMG_GetError());
     }

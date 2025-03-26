@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -g
 LDFLAGS=-lSDL2 -lSDL2_ttf -lSDL2_image
 
-SRC=src/main.c
+SRC=Snakefinal/src/main.c
 OBJ=$(SRC:.c=.o)
 EXEC=snake
 
