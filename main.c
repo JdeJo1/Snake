@@ -1,28 +1,28 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>  // Bibliothèque pour afficher du texte
-#include <SDL2/SDL_image.h> // Bibliothèque pour charger des images
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #define TILE_SIZE 20
 #define SNAKE_MAX_LENGTH 100
-#define MAX_OBSTACLES 10 // Nombre maximum d'obstacles à l'écran
-#define OBSTACLE_INTERVAL 5000 // Temps en millisecondes entre l'ajout des obstacles (5 secondes)
+#define OBSTACLE_INTERVAL 5000  // 5 secondes
+#define MAX_OBSTACLES 10
 
-// Structure pour les points
+// Structure des points
 typedef struct {
     int x, y;
 } Point;
 
-// Variables du serpent
 Point snake[SNAKE_MAX_LENGTH];
 int snake_length = 3;
 Point fruit;
+Point obstacles[MAX_OBSTACLES];
+int num_obstacles = 0;
 char direction = 'd';  // Départ vers la droite
 bool running = true;
 
-// Variables de la fenêtre SDL
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 int WIDTH = 640;
@@ -35,20 +35,53 @@ SDL_Texture* scoreTexture = NULL;
 SDL_Rect scoreRect;
 int score = 0;
 
-// Variables pour les obstacles
-Point obstacles[MAX_OBSTACLES];
-int num_obstacles = 0;
-Uint32 last_obstacle_time = 0;
-
-// Variables pour les images
 SDL_Texture* fruitTexture = NULL;
 SDL_Texture* obstacleTexture = NULL;
+Uint32 last_obstacle_time = 0;
 
-// Fonction pour initialiser SDL
+// Fonction pour afficher l'écran d'accueil
+void show_main_menu() {
+    SDL_Event event;
+    bool menu_running = true;
+
+    // Affichage de l'écran d'accueil
+    while (menu_running) {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Fond noir
+        SDL_RenderClear(renderer);
+
+        // Afficher le message "Appuyez sur ENTER pour commencer"
+        SDL_Surface* textSurface = TTF_RenderText_Solid(font, "Appuyez sur ENTER pour commencer", textColor);
+        SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+
+        SDL_Rect textRect = {WIDTH / 2 - textSurface->w / 2, HEIGHT / 2 - textSurface->h / 2, textSurface->w, textSurface->h};
+        SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+        SDL_FreeSurface(textSurface);
+        SDL_DestroyTexture(textTexture);
+
+        // Afficher l'écran
+        SDL_RenderPresent(renderer);
+
+        // Gérer les événements
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                running = false;
+                menu_running = false;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_SPACE) {
+                    // L'utilisateur appuie sur Enter ou Espace pour commencer
+                    menu_running = false;
+                }
+            }
+        }
+    }
+}
+
+// Initialisation de SDL et SDL_ttf
 void init_SDL() {
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init(); // Initialisation de SDL_ttf
-    IMG_Init(IMG_INIT_PNG);  // Initialisation de SDL_image pour charger des PNG
+    IMG_Init(IMG_INIT_PNG); // Initialisation de SDL_image
 
     window = SDL_CreateWindow("Snake SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -61,33 +94,23 @@ void init_SDL() {
     }
 }
 
-// Fonction pour charger l'image du fruit
+// Charger l'image du fruit
 void load_fruit_image() {
-    fruitTexture = IMG_LoadTexture(renderer, "fruit.png");  // Remplacer "fruit.png" par le chemin vers votre image
+    fruitTexture = IMG_LoadTexture(renderer, "fruit.png");
     if (!fruitTexture) {
-        printf("Erreur de chargement de l'image du fruit : %s\n", SDL_GetError());
-        running = false;
+        printf("Erreur chargement image fruit : %s\n", IMG_GetError());
     }
 }
 
-// Fonction pour charger l'image de l'obstacle
+// Charger l'image de l'obstacle
 void load_obstacle_image() {
-    obstacleTexture = IMG_LoadTexture(renderer, "obstacle.png");  // Remplacer "obstacle.png" par le chemin vers votre image
+    obstacleTexture = IMG_LoadTexture(renderer, "obstacle.png");
     if (!obstacleTexture) {
-        printf("Erreur de chargement de l'image de l'obstacle : %s\n", SDL_GetError());
-        running = false;
+        printf("Erreur chargement image obstacle : %s\n", IMG_GetError());
     }
 }
 
-// Fonction pour initialiser les obstacles
-void init_obstacles() {
-    for (int i = 0; i < MAX_OBSTACLES; i++) {
-        obstacles[i].x = rand() % (WIDTH / TILE_SIZE);  // Coordonnée X aléatoire
-        obstacles[i].y = rand() % (HEIGHT / TILE_SIZE); // Coordonnée Y aléatoire
-    }
-}
-
-// Fonction pour mettre à jour la texture du score
+// Met à jour la texture du score
 void update_score_texture() {
     if (scoreTexture) SDL_DestroyTexture(scoreTexture); // Supprimer l'ancienne texture
 
@@ -105,30 +128,30 @@ void update_score_texture() {
     SDL_FreeSurface(textSurface);
 }
 
-// Fonction pour dessiner le jeu
+// Dessine le jeu
 void draw_game() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Fond noir
     SDL_RenderClear(renderer);
 
-    // Dessiner le fruit (avec l'image)
+    // Dessiner le fruit
     if (fruitTexture) {
         SDL_Rect fruitRect = {fruit.x * TILE_SIZE, fruit.y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
         SDL_RenderCopy(renderer, fruitTexture, NULL, &fruitRect);
     }
 
-    // Dessiner le serpent (vert)
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    for (int i = 0; i < snake_length; i++) {
-        SDL_Rect snakeRect = {snake[i].x * TILE_SIZE, snake[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
-        SDL_RenderFillRect(renderer, &snakeRect);
-    }
-
-    // Dessiner les obstacles (avec l'image)
+    // Dessiner les obstacles
     if (obstacleTexture) {
         for (int i = 0; i < num_obstacles; i++) {
             SDL_Rect obstacleRect = {obstacles[i].x * TILE_SIZE, obstacles[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
             SDL_RenderCopy(renderer, obstacleTexture, NULL, &obstacleRect);
         }
+    }
+
+    // Dessiner le serpent
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Vert
+    for (int i = 0; i < snake_length; i++) {
+        SDL_Rect snakeRect = {snake[i].x * TILE_SIZE, snake[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+        SDL_RenderFillRect(renderer, &snakeRect);
     }
 
     // Afficher le score
@@ -137,7 +160,7 @@ void draw_game() {
     SDL_RenderPresent(renderer);
 }
 
-// Fonction pour gérer les entrées clavier et événements
+// Gère les entrées clavier et événements
 void handle_input() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -150,17 +173,11 @@ void handle_input() {
                 case SDLK_LEFT: if (direction != 'l') direction = 'l'; break;
                 case SDLK_RIGHT: if (direction != 'r') direction = 'r'; break;
             }
-        } else if (event.type == SDL_WINDOWEVENT) {
-            if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-                WIDTH = event.window.data1;
-                HEIGHT = event.window.data2;
-                update_score_texture(); // Recalculer l'affichage du score
-            }
         }
     }
 }
 
-// Fonction pour mettre à jour le jeu
+// Met à jour le jeu
 void update_game() {
     // Déplacer le corps du serpent
     for (int i = snake_length - 1; i > 0; i--) {
@@ -183,13 +200,6 @@ void update_game() {
     for (int i = 1; i < snake_length; i++) {
         if (snake[0].x == snake[i].x && snake[0].y == snake[i].y) {
             running = false;
-        }
-    }
-
-    // Vérifier collision avec les obstacles
-    for (int i = 0; i < num_obstacles; i++) {
-        if (snake[0].x == obstacles[i].x && snake[0].y == obstacles[i].y) {
-            running = false; // Game over si collision avec obstacle
         }
     }
 
@@ -222,6 +232,9 @@ int main() {
     // Charger les images
     load_fruit_image();
     load_obstacle_image();
+
+    // Afficher l'écran d'accueil avant de commencer le jeu
+    show_main_menu();  // L'écran d'accueil
 
     // Position initiale du serpent
     for (int i = 0; i < snake_length; i++) {
