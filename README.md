@@ -1,4 +1,6 @@
+# Copier 
 git clone https://jdejo1/snake
 
-compile: make all
-execute: ./run.sh
+# Compile: make all
+
+# Execute: ./run.sh
