@@ -1,25 +1,28 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_ttf.h>  // Bibliothèque pour afficher du texte
+#include <SDL2/SDL_image.h> // Bibliothèque pour charger des images
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define TILE_SIZE 20
 #define SNAKE_MAX_LENGTH 100
-#define MAX_OBSTACLES 10  // Nombre maximum d'obstacles
+#define MAX_OBSTACLES 10 // Nombre maximum d'obstacles à l'écran
+#define OBSTACLE_INTERVAL 5000 // Temps en millisecondes entre l'ajout des obstacles (5 secondes)
 
+// Structure pour les points
 typedef struct {
     int x, y;
 } Point;
 
+// Variables du serpent
 Point snake[SNAKE_MAX_LENGTH];
 int snake_length = 3;
 Point fruit;
 char direction = 'd';  // Départ vers la droite
 bool running = true;
 
-Point obstacles[MAX_OBSTACLES];  // Tableau pour les obstacles
-int num_obstacles = 3;  // Nombre d'obstacles à générer
-
+// Variables de la fenêtre SDL
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 int WIDTH = 640;
@@ -32,19 +35,25 @@ SDL_Texture* scoreTexture = NULL;
 SDL_Rect scoreRect;
 int score = 0;
 
-// Timer pour les obstacles
-Uint32 last_obstacle_time = 0;  // Dernière fois où les obstacles ont été générés
-Uint32 obstacle_interval = 5000;  // Intervalle de 5 secondes pour générer des obstacles
+// Variables pour les obstacles
+Point obstacles[MAX_OBSTACLES];
+int num_obstacles = 0;
+Uint32 last_obstacle_time = 0;
 
-// Initialisation de SDL et SDL_ttf
+// Variables pour les images
+SDL_Texture* fruitTexture = NULL;
+SDL_Texture* obstacleTexture = NULL;
+
+// Fonction pour initialiser SDL
 void init_SDL() {
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init(); // Initialisation de SDL_ttf
+    IMG_Init(IMG_INIT_PNG);  // Initialisation de SDL_image pour charger des PNG
 
     window = SDL_CreateWindow("Snake SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    // Charger la police (modifie "Arial.ttf" selon la police disponible)
+    // Charger la police
     font = TTF_OpenFont("Arial.ttf", 24);
     if (!font) {
         printf("Erreur chargement police : %s\n", TTF_GetError());
@@ -52,7 +61,33 @@ void init_SDL() {
     }
 }
 
-// Met à jour la texture du score
+// Fonction pour charger l'image du fruit
+void load_fruit_image() {
+    fruitTexture = IMG_LoadTexture(renderer, "fruit.png");  // Remplacer "fruit.png" par le chemin vers votre image
+    if (!fruitTexture) {
+        printf("Erreur de chargement de l'image du fruit : %s\n", SDL_GetError());
+        running = false;
+    }
+}
+
+// Fonction pour charger l'image de l'obstacle
+void load_obstacle_image() {
+    obstacleTexture = IMG_LoadTexture(renderer, "obstacle.png");  // Remplacer "obstacle.png" par le chemin vers votre image
+    if (!obstacleTexture) {
+        printf("Erreur de chargement de l'image de l'obstacle : %s\n", SDL_GetError());
+        running = false;
+    }
+}
+
+// Fonction pour initialiser les obstacles
+void init_obstacles() {
+    for (int i = 0; i < MAX_OBSTACLES; i++) {
+        obstacles[i].x = rand() % (WIDTH / TILE_SIZE);  // Coordonnée X aléatoire
+        obstacles[i].y = rand() % (HEIGHT / TILE_SIZE); // Coordonnée Y aléatoire
+    }
+}
+
+// Fonction pour mettre à jour la texture du score
 void update_score_texture() {
     if (scoreTexture) SDL_DestroyTexture(scoreTexture); // Supprimer l'ancienne texture
 
@@ -70,15 +105,16 @@ void update_score_texture() {
     SDL_FreeSurface(textSurface);
 }
 
-// Dessine le jeu
+// Fonction pour dessiner le jeu
 void draw_game() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Fond noir
     SDL_RenderClear(renderer);
 
-    // Dessiner le fruit (rouge)
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_Rect fruitRect = {fruit.x * TILE_SIZE, fruit.y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
-    SDL_RenderFillRect(renderer, &fruitRect);
+    // Dessiner le fruit (avec l'image)
+    if (fruitTexture) {
+        SDL_Rect fruitRect = {fruit.x * TILE_SIZE, fruit.y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+        SDL_RenderCopy(renderer, fruitTexture, NULL, &fruitRect);
+    }
 
     // Dessiner le serpent (vert)
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
@@ -87,11 +123,12 @@ void draw_game() {
         SDL_RenderFillRect(renderer, &snakeRect);
     }
 
-    // Dessiner les obstacles (gris)
-    SDL_SetRenderDrawColor(renderer, 169, 169, 169, 255); // Gris pour les obstacles
-    for (int i = 0; i < num_obstacles; i++) {
-        SDL_Rect obstacleRect = {obstacles[i].x * TILE_SIZE, obstacles[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
-        SDL_RenderFillRect(renderer, &obstacleRect);
+    // Dessiner les obstacles (avec l'image)
+    if (obstacleTexture) {
+        for (int i = 0; i < num_obstacles; i++) {
+            SDL_Rect obstacleRect = {obstacles[i].x * TILE_SIZE, obstacles[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+            SDL_RenderCopy(renderer, obstacleTexture, NULL, &obstacleRect);
+        }
     }
 
     // Afficher le score
@@ -100,7 +137,7 @@ void draw_game() {
     SDL_RenderPresent(renderer);
 }
 
-// Gère les entrées clavier et événements
+// Fonction pour gérer les entrées clavier et événements
 void handle_input() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -123,7 +160,7 @@ void handle_input() {
     }
 }
 
-// Met à jour le jeu
+// Fonction pour mettre à jour le jeu
 void update_game() {
     // Déplacer le corps du serpent
     for (int i = snake_length - 1; i > 0; i--) {
@@ -168,21 +205,23 @@ void update_game() {
         update_score_texture();
     }
 
-    // Vérifier si 5 secondes se sont écoulées pour ajouter de nouveaux obstacles
-    Uint32 current_time = SDL_GetTicks();
-    if (current_time - last_obstacle_time >= obstacle_interval) {
-        // Générer un nouvel obstacle
+    // Ajouter des obstacles toutes les 5 secondes
+    if (SDL_GetTicks() - last_obstacle_time > OBSTACLE_INTERVAL) {
         if (num_obstacles < MAX_OBSTACLES) {
             obstacles[num_obstacles].x = rand() % (WIDTH / TILE_SIZE);
             obstacles[num_obstacles].y = rand() % (HEIGHT / TILE_SIZE);
             num_obstacles++;
         }
-        last_obstacle_time = current_time;  // Réinitialiser le timer
+        last_obstacle_time = SDL_GetTicks();
     }
 }
 
 int main() {
     init_SDL();
+
+    // Charger les images
+    load_fruit_image();
+    load_obstacle_image();
 
     // Position initiale du serpent
     for (int i = 0; i < snake_length; i++) {
@@ -205,8 +244,11 @@ int main() {
 
     // Nettoyage SDL
     if (scoreTexture) SDL_DestroyTexture(scoreTexture);
+    if (fruitTexture) SDL_DestroyTexture(fruitTexture);
+    if (obstacleTexture) SDL_DestroyTexture(obstacleTexture);
     TTF_CloseFont(font);
     TTF_Quit();
+    IMG_Quit();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
