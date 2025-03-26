@@ -1,6 +1,23 @@
-# Copier 
-git clone https://jdejo1/snake
+# Copier
 
-# Compile: make all
+```
+git clone https://github.com/JdeJo1/Snake
+```
 
-# Execute: ./run.sh
+#bibliothèques
+
+```
+SDL2_dev / SDL2_ttf / SDL2_image
+```
+
+# Compile: 
+
+```
+make all
+```
+
+# Execute:
+
+```
+./run.sh
+```
