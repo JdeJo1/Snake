@@ -1,10 +1,11 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>  // Bibliothèque pour afficher du texte
+#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include <stdio.h>
 
 #define TILE_SIZE 20
 #define SNAKE_MAX_LENGTH 100
+#define MAX_OBSTACLES 10  // Nombre maximum d'obstacles
 
 typedef struct {
     int x, y;
@@ -15,6 +16,9 @@ int snake_length = 3;
 Point fruit;
 char direction = 'd';  // Départ vers la droite
 bool running = true;
+
+Point obstacles[MAX_OBSTACLES];  // Tableau pour les obstacles
+int num_obstacles = 3;  // Nombre d'obstacles à générer
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
@@ -27,6 +31,10 @@ SDL_Color textColor = {255, 255, 255, 255}; // Blanc
 SDL_Texture* scoreTexture = NULL;
 SDL_Rect scoreRect;
 int score = 0;
+
+// Timer pour les obstacles
+Uint32 last_obstacle_time = 0;  // Dernière fois où les obstacles ont été générés
+Uint32 obstacle_interval = 5000;  // Intervalle de 5 secondes pour générer des obstacles
 
 // Initialisation de SDL et SDL_ttf
 void init_SDL() {
@@ -77,6 +85,13 @@ void draw_game() {
     for (int i = 0; i < snake_length; i++) {
         SDL_Rect snakeRect = {snake[i].x * TILE_SIZE, snake[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
         SDL_RenderFillRect(renderer, &snakeRect);
+    }
+
+    // Dessiner les obstacles (gris)
+    SDL_SetRenderDrawColor(renderer, 169, 169, 169, 255); // Gris pour les obstacles
+    for (int i = 0; i < num_obstacles; i++) {
+        SDL_Rect obstacleRect = {obstacles[i].x * TILE_SIZE, obstacles[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+        SDL_RenderFillRect(renderer, &obstacleRect);
     }
 
     // Afficher le score
@@ -134,17 +149,36 @@ void update_game() {
         }
     }
 
+    // Vérifier collision avec les obstacles
+    for (int i = 0; i < num_obstacles; i++) {
+        if (snake[0].x == obstacles[i].x && snake[0].y == obstacles[i].y) {
+            running = false; // Game over si collision avec obstacle
+        }
+    }
+
     // Manger le fruit
     if (snake[0].x == fruit.x && snake[0].y == fruit.y) {
-    snake_length++;
-    snake[snake_length - 1] = snake[snake_length - 2];  // Correction ici
+        snake_length++;
+        snake[snake_length - 1] = snake[snake_length - 2];  // Correction ici
 
-    score += 10;
-    fruit.x = rand() % (WIDTH / TILE_SIZE);
-    fruit.y = rand() % (HEIGHT / TILE_SIZE);
+        score += 10;
+        fruit.x = rand() % (WIDTH / TILE_SIZE);
+        fruit.y = rand() % (HEIGHT / TILE_SIZE);
 
-    update_score_texture();
-  }
+        update_score_texture();
+    }
+
+    // Vérifier si 5 secondes se sont écoulées pour ajouter de nouveaux obstacles
+    Uint32 current_time = SDL_GetTicks();
+    if (current_time - last_obstacle_time >= obstacle_interval) {
+        // Générer un nouvel obstacle
+        if (num_obstacles < MAX_OBSTACLES) {
+            obstacles[num_obstacles].x = rand() % (WIDTH / TILE_SIZE);
+            obstacles[num_obstacles].y = rand() % (HEIGHT / TILE_SIZE);
+            num_obstacles++;
+        }
+        last_obstacle_time = current_time;  // Réinitialiser le timer
+    }
 }
 
 int main() {
