@@ -19,5 +19,5 @@ make all
 # Execute:
 
 ```
-./snake
+make run
 ```

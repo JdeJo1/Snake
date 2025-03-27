@@ -37,7 +37,7 @@ void update_game() {
         snake_length++;
         snake[snake_length - 1] = snake[snake_length - 2];  // Correction ici
 
-        score += 10;
+        score += 1;
         fruit.x = rand() % (WIDTH / TILE_SIZE);
         fruit.y = rand() % (HEIGHT / TILE_SIZE);
 
