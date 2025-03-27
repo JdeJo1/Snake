@@ -9,16 +9,19 @@ OBJ_DIR=$(SRC_DIR)  # Les fichiers objets restent dans src
 EXEC=Snakefinal/snake  # L'exécutable sera dans le dossier principal
 
 # Trouver tous les fichiers .c et générer leurs fichiers objets correspondants
-SRC=$(wildcard $(SRC_DIR)/*.c)
-OBJ=$(SRC:.c=.o)
+SRC=$(wildcard $(SRC_DIR)/*.c) 
+HRC=$(wildcard $(SRC_DIR)/*.h) 
+OBJ=$(SRC:.c=.o) 
 
 # Règle principale
 all: $(EXEC)
 
 # Compilation de l'exécutable
 $(EXEC): $(OBJ)
-	$(CC) $(OBJ) -o $(EXEC) $(LDFLAGS)
+	$(CC) $(OBJ) -o $(EXEC) $(LDFLAGS) 
 
+%.o: %.c $(HRC)
+	gcc $(CFLAGS) -c $< -o $@
 # Compilation des fichiers objets
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

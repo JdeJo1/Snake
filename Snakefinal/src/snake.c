@@ -32,6 +32,12 @@ void update_game() {
         }
     }
 
+    // Vérifier collision avec les obstacles
+    for (int i = 0; i < num_obstacles; i++) {
+        if (snake[0].x == obstacles[i].x && snake[0].y == obstacles[i].y) {
+            running = false;
+        }
+    }
     // Manger le fruit
     if (snake[0].x == fruit.x && snake[0].y == fruit.y) {
         snake_length++;

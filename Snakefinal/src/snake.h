@@ -11,7 +11,7 @@
 
 extern Point snake[];
 extern int snake_length;
-extern char direction;  // Départ vers la droite
+extern char direction;
 extern int score;
 
 void update_game();
