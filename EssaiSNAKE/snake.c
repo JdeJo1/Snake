@@ -31,7 +31,7 @@ void draw_game() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Fond noir
     SDL_RenderClear(renderer);
 
-    // Dessiner le fruit (rouge)
+    // Dessiner le fruit
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_Rect fruitRect = {fruit.x * TILE_SIZE, fruit.y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
     SDL_RenderFillRect(renderer, &fruitRect);

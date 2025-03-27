@@ -6,8 +6,9 @@ Point snake[SNAKE_MAX_LENGTH]={};
 char direction = 'd';  // Départ vers la droite
 
 int score = 0;
-// Met à jour le jeu
+
 void update_game() {
+
     // Déplacer le corps du serpent
     for (int i = snake_length - 1; i > 0; i--) {
         snake[i] = snake[i - 1];
@@ -22,7 +23,7 @@ void update_game() {
     // Vérifier collisions avec les murs
     if (snake[0].x < 0 || snake[0].x >= WIDTH / TILE_SIZE ||
         snake[0].y < 0 || snake[0].y >= HEIGHT / TILE_SIZE) {
-        running = false; // Game over
+        running = false;
     }
 
     // Vérifier collision avec soi-même

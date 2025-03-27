@@ -97,14 +97,23 @@ void handle_input() {
             running = false;
         } else if (event.type == SDL_KEYDOWN) {
             switch (event.key.keysym.sym) {
-                case SDLK_UP: if (direction != 'u') direction = 'u'; break;
-                case SDLK_DOWN: if (direction != 'd') direction = 'd'; break;
-                case SDLK_LEFT: if (direction != 'l') direction = 'l'; break;
-                case SDLK_RIGHT: if (direction != 'r') direction = 'r'; break;
+                case SDLK_UP:    
+                    if (direction != 'd') direction = 'u'; 
+                    break;
+                case SDLK_DOWN:  
+                    if (direction != 'u') direction = 'd'; 
+                    break;
+                case SDLK_LEFT:  
+                    if (direction != 'r') direction = 'l'; 
+                    break;
+                case SDLK_RIGHT: 
+                    if (direction != 'l') direction = 'r'; 
+                    break;
             }
         }
     }
 }
+
 
 int main() {
     init_SDL();
