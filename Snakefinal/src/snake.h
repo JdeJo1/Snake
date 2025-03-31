@@ -9,18 +9,17 @@
 #include "world.h"
 #include "point.h"
 
-extern Point snake[];
-extern int snake_length;
-extern char direction;
+typedef struct snake_s
+{
+    char direction;
+    Point points[SNAKE_MAX_LENGTH];
+    int length, lives, score;
+}snake_t;
 
-extern Point snake2[];
-extern int snake_length2;
-extern char direction2;
+extern snake_t snakes[];
 
-extern int score1, score2;
-extern int lives1, lives2;
-
-
+void reset_snake(int player);
+void reset_completely_both_snakes();
 void update_game();
 
 #endif

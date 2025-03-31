@@ -1,92 +1,92 @@
 #include "snake.h"
+#include <stdlib.h>
 
-
-
-Point snake[SNAKE_MAX_LENGTH]={};
-int snake_length = 3;
-char direction = 'd'; 
-
-Point snake2[SNAKE_MAX_LENGTH] = {}; 
-int snake_length2 = 3;
-char direction2 = 's';
-
-int score1 = 0;
-int score2 = 0;  
-int lives1 = 3;
-int lives2 = 3;
-
+snake_t snakes[2];
 
 void reset_snake(int player) {
     if (player == 1) {
-        snake_length = 3;
-        for (int i = 0; i < snake_length; i++) {
-            snake[i].x = (WIDTH / TILE_SIZE) / 4 - i;
-            snake[i].y = (HEIGHT / TILE_SIZE) / 2;
+        snakes[0].length = 3;
+        for (int i = 0; i < snakes[0].length; i++) {
+            snakes[0].points[i].x = (WIDTH / TILE_SIZE) / 4 - i;
+            snakes[0].points[i].y = (HEIGHT / TILE_SIZE) / 2;
         }
-        direction = 'd'; // Vers la droite
+        
+        snakes[0].direction = 'd'; // Vers la droite
+        
     } else if (player == 2) {
-        snake_length2 = 3;
-        for (int i = 0; i < snake_length2; i++) {
-            snake2[i].x = (WIDTH / TILE_SIZE) * 3 / 4 + i; // À droite de l'écran
-            snake2[i].y = (HEIGHT / TILE_SIZE) / 2;
+        snakes[1].length = 3;
+        for (int i = 0; i < snakes[1].length; i++) {
+            snakes[1].points[i].x = (WIDTH / TILE_SIZE) * 3 / 4 + i; // À droite de l'écran
+            snakes[1].points[i].y = (HEIGHT / TILE_SIZE) / 2;
         }
-        direction2 = 'q'; // Vers la gauche
+        
+        snakes[1].direction = 'q'; // Vers la gauche
     }
 }
 
+void reset_completely_both_snakes(){
+    reset_snake(1);
+    reset_snake(2);
 
-#include "snake.h"
-#include <stdlib.h>
+    snakes[0].score=0;
+    snakes[0].lives=3;
+    snakes[0].direction='d';
+
+    snakes[1].score=0;
+    snakes[1].lives=3;
+    snakes[1].direction='s';
+}
 
 void update_game() {
     // Déplacement du Snake 1
-    for (int i = snake_length - 1; i > 0; i--) {
-        snake[i] = snake[i - 1];
+    for (int i = snakes[0].length - 1; i > 0; i--) {
+        snakes[0].points[i] = snakes[0].points[i-1];
     }
 
-    if (direction == 'u') snake[0].y--;
-    if (direction == 'd') snake[0].y++;
-    if (direction == 'l') snake[0].x--;
-    if (direction == 'r') snake[0].x++;
+    if (snakes[0].direction == 'u') snakes[0].points[0].y--;
+    if (snakes[0].direction == 'd') snakes[0].points[0].y++;
+    if (snakes[0].direction == 'l') snakes[0].points[0].x--;
+    if (snakes[0].direction == 'r') snakes[0].points[0].x++;
 
     // Déplacement du Snake 2 (si actif)
     if (num_players == 2) {
-        for (int i = snake_length2 - 1; i > 0; i--) {
-            snake2[i] = snake2[i - 1];
+        for (int i = snakes[1].length - 1; i > 0; i--) {
+            snakes[1].points[i] = snakes[1].points[i - 1];
         }
 
-        if (direction2 == 'z') snake2[0].y--;
-        if (direction2 == 's') snake2[0].y++;
-        if (direction2 == 'q') snake2[0].x--;
-        if (direction2 == 'd') snake2[0].x++;
+        if (snakes[1].direction == 'z') snakes[1].points[0].y--;
+        if (snakes[1].direction == 's') snakes[1].points[0].y++;
+        if (snakes[1].direction == 'q') snakes[1].points[0].x--;
+        if (snakes[1].direction == 'd') snakes[1].points[0].x++;
     }
 
     // Vérification des collisions pour Snake 1
     bool snake1_dead = false;
 
-    if (snake[0].x < 0 || snake[0].x >= WIDTH / TILE_SIZE || 
-        snake[0].y < 0 || snake[0].y >= HEIGHT / TILE_SIZE) {
+    if (snakes[0].points[0].x < 0 || snakes[0].points[0].x >= WIDTH / TILE_SIZE || 
+        snakes[0].points[0].y < 0 || snakes[0].points[0].y >= HEIGHT / TILE_SIZE) {
         snake1_dead = true;
     }
 
-    for (int i = 1; i < snake_length; i++) {
-        if (snake[0].x == snake[i].x && snake[0].y == snake[i].y) {
+    for (int i = 1; i < snakes[1].length; i++) {
+        if (snakes[0].points[0].x == snakes[0].points[i].x && snakes[0].points[0].y == snakes[0].points[i].y) {
             snake1_dead = true;
         }
     }
 
     for (int i = 0; i < num_obstacles; i++) {
-        if (snake[0].x == obstacles[i].x && snake[0].y == obstacles[i].y) {
+        if (snakes[0].points[0].x == obstacles[i].x && snakes[0].points[0].y == obstacles[i].y) {
             snake1_dead = true;
         }
     }
 
     if (snake1_dead) {
-        lives1--;
-        if (lives1 > 0) {
+        snakes[0].lives--;
+        if (snakes[0].lives > 0) {
             reset_snake(1);
         } else {
-            running = false; // Fin du jeu si le joueur 1 n'a plus de vies
+            playing = false; // Fin du jeu si le joueur 1 n'a plus de vies
+            screenshot=get_screenshot_texture();
         }
     }
 
@@ -94,26 +94,26 @@ void update_game() {
     if (num_players == 2) {
         bool snake2_dead = false;
 
-        if (snake2[0].x < 0 || snake2[0].x >= WIDTH / TILE_SIZE || 
-            snake2[0].y < 0 || snake2[0].y >= HEIGHT / TILE_SIZE) {
+        if (snakes[1].points[0].x < 0 || snakes[1].points[0].x >= WIDTH / TILE_SIZE || 
+            snakes[1].points[0].y < 0 || snakes[1].points[0].y >= HEIGHT / TILE_SIZE) {
             snake2_dead = true;
         }
 
-        for (int i = 1; i < snake_length2; i++) {
-            if (snake2[0].x == snake2[i].x && snake2[0].y == snake2[i].y) {
+        for (int i = 1; i < snakes[1].length; i++) {
+            if (snakes[1].points[0].x == snakes[1].points[i].x && snakes[1].points[0].y == snakes[1].points[i].y) {
                 snake2_dead = true;
             }
         }
 
         for (int i = 0; i < num_obstacles; i++) {
-            if (snake2[0].x == obstacles[i].x && snake2[0].y == obstacles[i].y) {
+            if (snakes[1].points[0].x == obstacles[i].x && snakes[1].points[0].y == obstacles[i].y) {
                 snake2_dead = true;
             }
         }
 
         if (snake2_dead) {
-            lives2--;
-            if (lives2 > 0) {
+            snakes[1].lives--;
+            if (snakes[1].lives > 0) {
                 reset_snake(2);
             } else {
                 num_players = 1; // Désactive le joueur 2
@@ -123,36 +123,36 @@ void update_game() {
 
     // Collision entre les deux serpents
     if (num_players == 2) {
-        for (int i = 0; i < snake_length; i++) {
-            if (snake[i].x == snake2[0].x && snake[i].y == snake2[0].y) {
-                lives2--;
-                if (lives2 > 0) reset_snake(2);
+        for (int i = 0; i < snakes[0].length; i++) {
+            if (snakes[0].points[i].x == snakes[1].points[0].x && snakes[0].points[i].y == snakes[1].points[0].y) {
+                snakes[1].lives--;
+                if (snakes[1].lives > 0) reset_snake(2);
             }
         }
 
-        for (int i = 0; i < snake_length2; i++) {
-            if (snake2[i].x == snake[0].x && snake2[i].y == snake[0].y) {
-                lives1--;
-                if (lives1 > 0) reset_snake(1);
+        for (int i = 0; i < snakes[1].length; i++) {
+            if (snakes[1].points[i].x == snakes[0].points[0].x && snakes[1].points[i].y == snakes[0].points[0].y) {
+                snakes[0].lives--;
+                if (snakes[0].lives > 0) reset_snake(1);
             }
         }
     }
 
     // Manger un fruit (Snake 1)
-if (snake[0].x == fruit.x && snake[0].y == fruit.y) {
-    snake[snake_length] = snake[snake_length - 1]; // Prend la position de l'ancien dernier segment
-    snake_length++;
-    score1++;
+if (snakes[0].points[0].x == fruit.x && snakes[0].points[0].y == fruit.y) {
+    snakes[0].points[snakes[0].length] = snakes[0].points[snakes[0].length - 1]; // Prend la position de l'ancien dernier segment
+    snakes[0].length++;
+    snakes[0].score++;
     fruit.x = rand() % (WIDTH / TILE_SIZE);
     fruit.y = rand() % (HEIGHT / TILE_SIZE);
     update_score_texture();
 }
 
 // Manger un fruit (Snake 2)
-if (num_players == 2 && snake2[0].x == fruit.x && snake2[0].y == fruit.y) {
-    snake2[snake_length2] = snake2[snake_length2 - 1]; // Même correction ici
-    snake_length2++;
-    score2++;
+if (num_players == 2 && snakes[1].points[0].x == fruit.x && snakes[1].points[0].y == fruit.y) {
+    snakes[1].points[snakes[1].length] = snakes[1].points[snakes[1].length - 1]; // Même correction ici
+    snakes[1].length++;
+    snakes[1].score++;
     fruit.x = rand() % (WIDTH / TILE_SIZE);
     fruit.y = rand() % (HEIGHT / TILE_SIZE);
     update_score_texture();

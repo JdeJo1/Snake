@@ -11,11 +11,14 @@
 #include "snake.h"
 #include "image.h"
 
+extern SDL_Texture *screenshot;
+
 extern int WIDTH;
 extern int HEIGHT;
 
 extern int num_obstacles;
 extern bool running;
+extern bool playing;
 
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
@@ -29,6 +32,8 @@ extern Point obstacles[];
 
 extern int num_players;
 
+extern Uint32 last_update_time;
+extern const Uint32 MOVE_DELAY; // Délai entre les déplacements en millisecondes (100ms = 0.1 seconde)
 
 void draw_game();
 

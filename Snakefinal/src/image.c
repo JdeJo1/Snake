@@ -41,10 +41,10 @@ void update_score_texture() {
     
     if (num_players ==2){
         sprintf(scoreText, "Joueur 1: %d pts - Vies: %d | Joueur 2: %d pts - Vies: %d",
-            score1, lives1, num_players == 2 ? score2 : 0, num_players == 2 ? lives2 : 0);
+            snakes[0].score, snakes[0].lives, num_players == 2 ? snakes[1].score : 0, num_players == 2 ? snakes[1].lives : 0);
         }
     else{
-    sprintf(scoreText, "Joueur 1: %d pts - Vies: %d", score1, lives1);
+    sprintf(scoreText, "Joueur 1: %d pts - Vies: %d", snakes[0].score, snakes[0].lives);
     }
     SDL_Surface* textSurface = TTF_RenderText_Solid(font, scoreText, textColor);
     if (textSurface) {
@@ -53,4 +53,12 @@ void update_score_texture() {
         scoreRect = (SDL_Rect){20, 20, textSurface->w, textSurface->h}; // Position en haut à gauche
         SDL_FreeSurface(textSurface);
     }
+}
+
+//Retourne un pointeur vers une texture issue d'une capture de la fenêtre
+SDL_Texture *get_screenshot_texture(){
+    SDL_Surface *sshot = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+    SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
+    SDL_Texture *sshotTxtr=SDL_CreateTextureFromSurface(renderer,sshot);
+    return sshotTxtr;
 }

@@ -21,5 +21,6 @@ void load_fruit_image();
 void load_obstacle_image();
 void load_logo_image();
 void update_score_texture();
+SDL_Texture *get_screenshot_texture();
 
 #endif

@@ -7,7 +7,9 @@ int WIDTH = 920;
 int HEIGHT = 920;
 
 int num_obstacles = 0;
+
 bool running = true;
+bool playing = true;
 int num_players = 1;
 
 SDL_Rect scoreRect;
@@ -16,6 +18,9 @@ Uint32 last_obstacle_time=0;
 
 Point fruit;
 Point obstacles[MAX_OBSTACLES];
+
+Uint32 last_update_time = 0;
+const Uint32 MOVE_DELAY = 100; // Délai entre les déplacements en millisecondes (100ms = 0.1 seconde)
 
 // Dessine le jeu
 void draw_game() {
@@ -38,16 +43,16 @@ void draw_game() {
 
     // Dessiner le Snake 1 (vert)
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    for (int i = 0; i < snake_length; i++) {
-        SDL_Rect snakeRect = {snake[i].x * TILE_SIZE, snake[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+    for (int i = 0; i < snakes[0].length; i++) {
+        SDL_Rect snakeRect = {snakes[0].points[i].x * TILE_SIZE, snakes[0].points[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
         SDL_RenderFillRect(renderer, &snakeRect);
     }
 
     // Dessiner le Snake 2 (rouge) seulement si on joue à 2 joueurs
     if (num_players == 2) {
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        for (int i = 0; i < snake_length2; i++) {
-            SDL_Rect snake2Rect = {snake2[i].x * TILE_SIZE, snake2[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+        for (int i = 0; i < snakes[1].length; i++) {
+            SDL_Rect snake2Rect = {snakes[1].points[i].x * TILE_SIZE, snakes[1].points[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
             SDL_RenderFillRect(renderer, &snake2Rect);
         }
     }
