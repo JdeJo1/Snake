@@ -6,4 +6,6 @@
 #define OBSTACLE_INTERVAL 5000
 #define MAX_OBSTACLES 10
 
+
+
 #endif

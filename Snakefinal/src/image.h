@@ -6,15 +6,15 @@
 #include <SDL2/SDL_image.h>
 #include "world.h"
 
-extern SDL_Texture *fruitTexture;
-extern SDL_Texture *obstacleTexture;
+extern SDL_Texture* fruitTexture;
+extern SDL_Texture* obstacleTexture;
 
 // Variable pour l'image du logo
-extern SDL_Texture *logoTexture;
-extern SDL_Texture *scoreTexture;
+extern SDL_Texture* logoTexture;
+extern SDL_Texture* scoreTexture;
 
 // Variables pour l'affichage du score
-extern TTF_Font *font;
+extern TTF_Font* font;
 extern SDL_Color textColor; // Blanc
 
 void load_fruit_image();

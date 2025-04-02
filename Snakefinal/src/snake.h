@@ -20,6 +20,13 @@ extern snake_t snakes[];
 
 void reset_snake(int player);
 void reset_completely_both_snakes();
+
+bool snake_collides_wall(snake_t *s);
+bool snake_collides_obstacle(snake_t *s);
+bool snake_autocollides(snake_t *s);
+void snake_refresh_eating(snake_t *s);
+
 void update_game();
+void print_snake_info(snake_t *s, int num);
 
 #endif

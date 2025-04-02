@@ -14,7 +14,7 @@ int num_players = 1;
 
 SDL_Rect scoreRect;
 
-Uint32 last_obstacle_time = 0;
+Uint32 last_obstacle_time=0;
 
 Point fruit;
 Point obstacles[MAX_OBSTACLES];
@@ -22,24 +22,29 @@ Point obstacles[MAX_OBSTACLES];
 Uint32 last_update_time = 0;
 const Uint32 MOVE_DELAY = 100; // Délai entre les déplacements en millisecondes (100ms = 0.1 seconde)
 
+void draw_snake_rect(snake_t *s){
+    if(s->lives>0){
+        for (int i = 0; i < s->length; i++) {
+            SDL_Rect snakeRect = {s->points[i].x * TILE_SIZE, s->points[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+            SDL_RenderFillRect(renderer, &snakeRect);
+        }
+    }
+}
+
 // Dessine le jeu
-void draw_game()
-{
+void draw_game() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Fond noir
     SDL_RenderClear(renderer);
 
     // Dessiner le fruit
-    if (fruitTexture)
-    {
+    if (fruitTexture) {
         SDL_Rect fruitRect = {fruit.x * TILE_SIZE, fruit.y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
         SDL_RenderCopy(renderer, fruitTexture, NULL, &fruitRect);
     }
 
     // Dessiner les obstacles
-    if (obstacleTexture)
-    {
-        for (int i = 0; i < num_obstacles; i++)
-        {
+    if (obstacleTexture) {
+        for (int i = 0; i < num_obstacles; i++) {
             SDL_Rect obstacleRect = {obstacles[i].x * TILE_SIZE, obstacles[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
             SDL_RenderCopy(renderer, obstacleTexture, NULL, &obstacleRect);
         }
@@ -47,26 +52,19 @@ void draw_game()
 
     // Dessiner le Snake 1 (vert)
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    for (int i = 0; i < snakes[0].length; i++)
-    {
-        SDL_Rect snakeRect = {snakes[0].points[i].x * TILE_SIZE, snakes[0].points[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
-        SDL_RenderFillRect(renderer, &snakeRect);
+    if(snakes[0].lives>0){
+        draw_snake_rect(&snakes[0]);
     }
+    
 
     // Dessiner le Snake 2 (rouge) seulement si on joue à 2 joueurs
-    if (num_players == 2)
-    {
+    if (sel_num_players == 2) {
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        for (int i = 0; i < snakes[1].length; i++)
-        {
-            SDL_Rect snake2Rect = {snakes[1].points[i].x * TILE_SIZE, snakes[1].points[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
-            SDL_RenderFillRect(renderer, &snake2Rect);
-        }
+        draw_snake_rect(&snakes[1]);
     }
 
     // Afficher le score
-    if (scoreTexture)
-        SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreRect);
+    if (scoreTexture) SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreRect);
 
     SDL_RenderPresent(renderer);
 }

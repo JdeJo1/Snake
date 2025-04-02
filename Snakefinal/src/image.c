@@ -39,9 +39,9 @@ void load_obstacle_image() {
 void update_score_texture() {
     char scoreText[100]; // pour éviter tout dépassement dz mémoire
     
-    if (num_players ==2){
+    if (sel_num_players ==2){
         sprintf(scoreText, "Joueur 1: %d pts - Vies: %d | Joueur 2: %d pts - Vies: %d",
-            snakes[0].score, snakes[0].lives, num_players == 2 ? snakes[1].score : 0, num_players == 2 ? snakes[1].lives : 0);
+            snakes[0].score, snakes[0].lives, sel_num_players == 2 ? snakes[1].score : 0, sel_num_players == 2 ? snakes[1].lives : 0);
         }
     else{
     sprintf(scoreText, "Joueur 1: %d pts - Vies: %d", snakes[0].score, snakes[0].lives);

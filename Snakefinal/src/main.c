@@ -15,27 +15,26 @@
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 
-SDL_Texture *screenshot = NULL;
+SDL_Texture *screenshot=NULL;
 
-void show_main_menu()
-{
+int sel_num_players=1;
+
+void show_main_menu() {
     SDL_Event event;
     bool menu_running = true;
     int selection = 1; // 1 joueur par défaut
 
     load_logo_image();
 
-    while (menu_running)
-    {
+    while (menu_running) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
         // Afficher le logo
-        if (logoTexture)
-        {
+        if (logoTexture) {
             int logoWidth, logoHeight;
             SDL_QueryTexture(logoTexture, NULL, NULL, &logoWidth, &logoHeight);
-            SDL_Rect logoRect = {0, 0, logoWidth, logoHeight};
+            SDL_Rect logoRect = {0,0, logoWidth, logoHeight};
             SDL_RenderCopy(renderer, logoTexture, NULL, &logoRect);
         }
 
@@ -46,21 +45,21 @@ void show_main_menu()
         SDL_Color colorSelected = {255, 255, 0, 255}; // Jaune si sélectionné
         SDL_Color colorNormal = {255, 255, 255, 255}; // Blanc normal
 
-        SDL_Surface *surface1 = TTF_RenderText_Solid(font, choix1, (selection == 1) ? colorSelected : colorNormal);
-        SDL_Surface *surface2 = TTF_RenderText_Solid(font, choix2, (selection == 2) ? colorSelected : colorNormal);
-        SDL_Texture *texture1 = SDL_CreateTextureFromSurface(renderer, surface1);
-        SDL_Texture *texture2 = SDL_CreateTextureFromSurface(renderer, surface2);
+        SDL_Surface* surface1 = TTF_RenderText_Solid(font, choix1, (selection == 1) ? colorSelected : colorNormal);
+        SDL_Surface* surface2 = TTF_RenderText_Solid(font, choix2, (selection == 2) ? colorSelected : colorNormal);
+        SDL_Texture* texture1 = SDL_CreateTextureFromSurface(renderer, surface1);
+        SDL_Texture* texture2 = SDL_CreateTextureFromSurface(renderer, surface2);
 
         SDL_Rect rect1 = {WIDTH / 2 - surface1->w / 2, HEIGHT / 2 - surface1->h, surface1->w, surface1->h};
         SDL_Rect rect2 = {WIDTH / 2 - surface2->w / 2, HEIGHT / 2 + surface2->h, surface2->w, surface2->h};
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 127);
-        SDL_RenderFillRect(renderer, &rect1);
-        SDL_RenderFillRect(renderer, &rect2);
-        SDL_SetRenderDrawColor(renderer, 255, 255, (selection == 1) ? 0 : 255, 255);
-        SDL_RenderDrawRect(renderer, &rect1);
-        SDL_SetRenderDrawColor(renderer, 255, 255, (selection == 2) ? 0 : 255, 255);
-        SDL_RenderDrawRect(renderer, &rect2);
+        SDL_SetRenderDrawColor(renderer,0,0,0,127);
+        SDL_RenderFillRect(renderer,&rect1);
+        SDL_RenderFillRect(renderer,&rect2);
+        SDL_SetRenderDrawColor(renderer,255,255,(selection==1)?0:255,255);
+        SDL_RenderDrawRect(renderer,&rect1);
+        SDL_SetRenderDrawColor(renderer,255,255,(selection==2)?0:255,255);
+        SDL_RenderDrawRect(renderer,&rect2);
 
         SDL_RenderCopy(renderer, texture1, NULL, &rect1);
         SDL_RenderCopy(renderer, texture2, NULL, &rect2);
@@ -72,27 +71,23 @@ void show_main_menu()
 
         SDL_RenderPresent(renderer);
 
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-            {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
                 running = false;
                 menu_running = false;
-            }
-            else if (event.type == SDL_KEYDOWN)
-            {
-                if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN)
-                {
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN) {
                     selection = (selection == 1) ? 2 : 1;
                 }
-                if (event.key.keysym.sym == SDLK_RETURN)
-                {
-                    num_players = selection;
+                if (event.key.keysym.sym == SDLK_RETURN) {
+                    sel_num_players = selection;
                     menu_running = false;
                 }
             }
         }
     }
+
+
 
     // Libérer la texture du logo après utilisation
     if (logoTexture)
@@ -110,7 +105,7 @@ void init_SDL()
 
     window = SDL_CreateWindow("Snake SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);
 
     // Charger la police
     font = TTF_OpenFont("Snakefinal/cosmetiques/Arial.ttf", 24);
@@ -130,19 +125,6 @@ int main()
 
     srand(time(NULL));
 
-    // Initialisation des positions des serpents
-    for (int i = 0; i < snakes[0].length; i++)
-    {
-        snakes[0].points[i].x = (WIDTH / TILE_SIZE) / 2 - 10;
-        snakes[0].points[i].y = (HEIGHT / TILE_SIZE) / 2;
-    }
-
-    for (int i = 0; i < snakes[1].length; i++)
-    {
-        snakes[1].points[i].x = (WIDTH / TILE_SIZE) / 2 + 10;
-        snakes[1].points[i].y = (HEIGHT / TILE_SIZE) / 2;
-    }
-
     fruit.x = rand() % (WIDTH / TILE_SIZE);
     fruit.y = rand() % (HEIGHT / TILE_SIZE);
     reset_completely_both_snakes();
@@ -151,6 +133,9 @@ int main()
         play_game();
         show_end_screen();
     }
+    
+    
+    
 
     // Nettoyage SDL
     if (scoreTexture)
