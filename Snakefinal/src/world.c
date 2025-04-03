@@ -64,7 +64,7 @@ void draw_game() {
     }
 
     // Afficher le score
-    if (scoreTexture) SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreRect);
+    if (playing&&scoreTexture) SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreRect);
 
     SDL_RenderPresent(renderer);
 }

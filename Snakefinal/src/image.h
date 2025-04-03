@@ -6,6 +6,11 @@
 #include <SDL2/SDL_image.h>
 #include "world.h"
 
+typedef struct rectBlock_s{
+    SDL_Rect *rect;
+    SDL_Color fillColor, drawColor;
+}rectBlock_t;
+
 extern SDL_Texture* fruitTexture;
 extern SDL_Texture* obstacleTexture;
 
@@ -23,4 +28,7 @@ void load_logo_image();
 void update_score_texture();
 SDL_Texture *get_screenshot_texture();
 
+void rectblock_draw(rectBlock_t *rb);
+void rectblock_draw_with_text(rectBlock_t *rb,char *txt);
+void renderer_print_text(SDL_Rect *r,SDL_Color c, char *txt);
 #endif

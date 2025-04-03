@@ -16,4 +16,5 @@ void quit();
 
 void handle_input();
 
+void display_scores();
 #endif

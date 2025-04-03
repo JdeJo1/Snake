@@ -203,6 +203,7 @@ void update_game() {
     }
     if(end){
         playing=false;
+        draw_game();
         screenshot=get_screenshot_texture();
     }
 

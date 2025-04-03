@@ -62,3 +62,22 @@ SDL_Texture *get_screenshot_texture(){
     SDL_Texture *sshotTxtr=SDL_CreateTextureFromSurface(renderer,sshot);
     return sshotTxtr;
 }
+
+void rectblock_draw(rectBlock_t *rb){
+    SDL_SetRenderDrawColor(renderer,rb->fillColor.r,rb->fillColor.g,rb->fillColor.b,rb->fillColor.a);
+    SDL_RenderFillRect(renderer,rb->rect);
+    SDL_SetRenderDrawColor(renderer,rb->drawColor.r,rb->drawColor.g,rb->drawColor.b,rb->drawColor.a);
+    SDL_RenderDrawRect(renderer,rb->rect);
+}
+void rectblock_draw_with_text(rectBlock_t *rb,char *txt){
+    rectblock_draw(rb);
+    renderer_print_text(rb->rect,rb->drawColor,txt);
+}
+void renderer_print_text(SDL_Rect *r,SDL_Color c, char *txt){
+    SDL_Surface *rb_surf=TTF_RenderText_Solid(font,txt,c);
+    //Texture du bouton "QUIT"
+    SDL_Texture* rb_texture = SDL_CreateTextureFromSurface(renderer, rb_surf);
+    SDL_RenderCopy(renderer, rb_texture, NULL, r);
+    SDL_FreeSurface(rb_surf);
+    SDL_DestroyTexture(rb_texture);
+}

@@ -62,58 +62,34 @@ void show_end_screen(){
                 SDL_Rect logoRect = {0,0, logoWidth, logoHeight};
                 SDL_RenderCopy(renderer, logoTexture, NULL, &logoRect);
             }          
-
-            SDL_Color colorNormal = {255, 255, 255, 255}; // Blanc normal
             
-            
+            rectBlock_t go_rb, rep_rb, quit_rb;
             SDL_Rect rect;
+
+            go_rb.fillColor=(SDL_Color){0,0,0,127};
+            go_rb.drawColor=(SDL_Color){255,255,255,255};
+            go_rb.rect=&rect;
             rect.w=200;
             rect.h=40;
             rect.x=(WIDTH-rect.w)/2;
             rect.y=(HEIGHT-rect.h)/2;
-            SDL_SetRenderDrawColor(renderer,0,0,0,127);
-            SDL_RenderFillRect(renderer,&rect);
-            SDL_SetRenderDrawColor(renderer,255,255,255,255);
-            SDL_RenderDrawRect(renderer,&rect);
-            //Surface du texte "GAME OVER"
-            SDL_Surface *go_surf=TTF_RenderText_Solid(font,"GAME OVER",colorNormal);
-            //Texture du texte "GAME OVER"
-            SDL_Texture* go_texture = SDL_CreateTextureFromSurface(renderer, go_surf);
-            SDL_RenderCopy(renderer, go_texture, NULL, &rect);
-            SDL_FreeSurface(go_surf);
-            SDL_DestroyTexture(go_texture);
-
-            //Couleur de police du bouton "REPLAY"
-            SDL_Color rep_txt_color={(selection==1)?255:0,255,(selection==1)?255:0,255};
+            rectblock_draw_with_text(&go_rb,"GAME OVER");
+            
+            rep_rb.fillColor=(SDL_Color){0,(selection==1)?255:0,0,(selection==1)?255:127};
+            rep_rb.drawColor=(SDL_Color){(selection==1)?255:0,255,(selection==1)?255:0,255};
+            rep_rb.rect=&rect;
             rect.x=(3*WIDTH-2*rect.w)/4;
             rect.y=3*HEIGHT/4;
-            SDL_SetRenderDrawColor(renderer,0,(selection==1)?255:0,0,(selection==1)?255:127);
-            SDL_RenderFillRect(renderer,&rect);
-            SDL_SetRenderDrawColor(renderer,(selection==1)?255:0,255,(selection==1)?255:0,255);
-            SDL_RenderDrawRect(renderer,&rect);
-            //Surface du bouton "REPLAY"
-            SDL_Surface *rep_surf=TTF_RenderText_Solid(font,"REPLAY",rep_txt_color);
-            //Texture du bouton "REPLAY"
-            SDL_Texture* rep_texture = SDL_CreateTextureFromSurface(renderer, rep_surf);
-            SDL_RenderCopy(renderer, rep_texture, NULL, &rect);
-            SDL_FreeSurface(rep_surf);
-            SDL_DestroyTexture(rep_texture);
+            rectblock_draw_with_text(&rep_rb,"REPLAY");
 
-            //Couleur de police du bouton "QUIT"
-            SDL_Color quit_txt_color={255,(selection==0)?255:0,(selection==0)?255:0,255};
+            quit_rb.fillColor=(SDL_Color){(selection==0)?255:0,0,0,(selection==0)?255:127};
+            quit_rb.drawColor=(SDL_Color){255,(selection==0)?255:0,(selection==0)?255:0,255};
+            quit_rb.rect=&rect;
             rect.x=(WIDTH-2*rect.w)/4;
             rect.y=3*HEIGHT/4;
-            SDL_SetRenderDrawColor(renderer,(selection==0)?255:0,0,0,(selection==0)?255:127);
-            SDL_RenderFillRect(renderer,&rect);
-            SDL_SetRenderDrawColor(renderer,255,(selection==0)?255:0,(selection==0)?255:0,255);
-            SDL_RenderDrawRect(renderer,&rect);
-            //Surface du bouton "QUIT"
-            SDL_Surface *quit_surf=TTF_RenderText_Solid(font,"QUIT",quit_txt_color);
-            //Texture du bouton "QUIT"
-            SDL_Texture* quit_texture = SDL_CreateTextureFromSurface(renderer, quit_surf);
-            SDL_RenderCopy(renderer, quit_texture, NULL, &rect);
-            SDL_FreeSurface(quit_surf);
-            SDL_DestroyTexture(quit_texture);
+            rectblock_draw_with_text(&quit_rb,"QUIT");
+
+            display_scores();
 
             SDL_RenderPresent(renderer);
 
@@ -232,4 +208,38 @@ void handle_input()
             }
         }
     }
+}
+void display_scores(){
+    bool blk_2h=((SDL_GetTicks()%500)<250);
+    bool disp_p1=false, disp_p2=false;
+    if(sel_num_players==2){
+        disp_p1=((snakes[0].score<snakes[1].score)||blk_2h);
+        disp_p2=((snakes[0].score>snakes[1].score)||blk_2h);
+    }
+    else{
+        disp_p1=true;
+    }
+    rectBlock_t rb;
+    SDL_Rect rect, txt_rect;
+    rb.rect=&rect;
+    rb.fillColor=(SDL_Color){127,127,127,127};
+    rb.drawColor=(SDL_Color){255,255,255,255};
+    rect.w=200;
+    rect.h=80;
+    rect.x=(WIDTH/2-rect.w)/2;
+    rect.y=(HEIGHT/2-rect.h)/2;
+    rectblock_draw(&rb);
+    char score_txt[20];
+    sprintf(score_txt,"Score : %02d",snakes[0].score);
+    txt_rect.x=rect.x;
+    txt_rect.y=rect.y;
+    txt_rect.w=rect.w;
+    txt_rect.h=rect.h/2;
+    if(disp_p1) renderer_print_text(&txt_rect,(SDL_Color){0,255,0,255},score_txt);
+
+    sprintf(score_txt,"Score : %02d",snakes[1].score);
+    txt_rect.y+=txt_rect.h;
+    if(disp_p2) renderer_print_text(&txt_rect,(SDL_Color){255,0,0,255},score_txt);
+    
+
 }
