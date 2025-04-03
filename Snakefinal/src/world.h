@@ -37,5 +37,7 @@ extern Uint32 last_update_time;
 extern const Uint32 MOVE_DELAY; // Délai entre les déplacements en millisecondes (100ms = 0.1 seconde)
 
 void draw_game();
+void fruit_renew_coord();
+void world_add_new_obstacle();
 
 #endif

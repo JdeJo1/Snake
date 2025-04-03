@@ -68,3 +68,29 @@ void draw_game() {
 
     SDL_RenderPresent(renderer);
 }
+
+void fruit_renew_coord(){
+    bool conflict=false;
+    
+    fruit.x = rand() % (WIDTH / TILE_SIZE);
+    fruit.y = rand() % (HEIGHT / TILE_SIZE);
+    for(int i=0; i<num_obstacles; i++){
+        if(points_have_same_coord(&fruit,&obstacles[i])){
+            conflict=true;
+            break;
+        }
+    }
+    if(conflict){
+        fruit_renew_coord();
+    }
+}
+
+void world_add_new_obstacle(){
+    obstacles[num_obstacles].x = rand() % (WIDTH / TILE_SIZE);
+    obstacles[num_obstacles].y = rand() % (HEIGHT / TILE_SIZE);
+    if(points_have_same_coord(&fruit,&obstacles[num_obstacles])){
+        world_add_new_obstacle();
+    }
+    num_obstacles++;
+    
+}

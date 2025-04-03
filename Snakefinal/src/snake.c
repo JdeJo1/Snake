@@ -37,7 +37,6 @@ void reset_completely_both_snakes(){
     snakes[1].direction='u';
 
     num_players=sel_num_players;
-    printf("%d player(s)\r\n",num_players);
 }
 
 //Mettre à jour les coordonnées du snake "s"
@@ -66,7 +65,7 @@ bool snake_collides_wall(snake_t *s){
 bool snake_collides_obstacle(snake_t *s){
     bool coll=false;
     for (int i = 0; i < num_obstacles; i++) {
-        if (point_have_same_coord(&s->points[0],&obstacles[i])) {
+        if (points_have_same_coord(&s->points[0],&obstacles[i])) {
             coll = true;
         }
     }
@@ -77,7 +76,7 @@ bool snake_collides_obstacle(snake_t *s){
 bool snake_autocollides(snake_t *s){
     bool coll=false;
     for (int i = 1; i < s->length; i++) {
-        if (point_have_same_coord(&s->points[0],&s->points[i])) {
+        if (points_have_same_coord(&s->points[0],&s->points[i])) {
             coll = true;
         }
     }
@@ -90,12 +89,11 @@ bool snake_autocollides(snake_t *s){
 - Réaffecter de nouvelles coordonnées au fruit
 */
 void snake_refresh_eating(snake_t *s){
-    if (point_have_same_coord(&s->points[0],&fruit)) {
+    if (points_have_same_coord(&s->points[0],&fruit)) {
         s->points[s->length] = s->points[s->length - 1]; // Prend la position de l'ancien dernier segment
         s->length++;
         s->score++;
-        fruit.x = rand() % (WIDTH / TILE_SIZE);
-        fruit.y = rand() % (HEIGHT / TILE_SIZE);
+        fruit_renew_coord();
         update_score_texture();
     }
 }
@@ -120,7 +118,6 @@ void update_game() {
         }
 
         if (snake1_dead) {
-            printf("Snake 0 dead\r\n");
             snakes[0].lives--;
             if (snakes[0].lives > 0) {
                 reset_snake(1);
@@ -140,28 +137,23 @@ void update_game() {
 
             if (snake_collides_wall(&snakes[1])) {
                 snake2_dead = true;
-                printf("Snake 1 collides wall\r\n");
             }
 
             if(snake_autocollides(&snakes[1])){
                 snake2_dead = true;
-                printf("Snake 1 autocollides\r\n");
             }
 
             if(snake_collides_obstacle(&snakes[1])){
                 snake2_dead = true;
-                printf("Snake 1 collides obstacle\r\n");
             }
 
             if (snake2_dead) {
-                printf("Snake 1 dead\r\n");
                 snakes[1].lives--;
                 if (snakes[1].lives > 0) {
                     reset_snake(2); 
                 } else {
                     num_players = 1; // Désactive le joueur 2
                 }
-                print_snake_info(&snakes[1],1);
             }
         }
         
@@ -170,16 +162,14 @@ void update_game() {
     if((snakes[0].lives>0)&&(snakes[1].lives>0)&&(sel_num_players == 2)){
         // Collision entre les deux serpents
         for (int i = 0; i < snakes[0].length; i++) {
-            if (point_have_same_coord(&snakes[0].points[i],&snakes[1].points[0])) {
-                printf("Snake 1 collides snake 2\r\n");
+            if (points_have_same_coord(&snakes[0].points[i],&snakes[1].points[0])) {
                 snakes[1].lives--;
                 if (snakes[1].lives > 0) reset_snake(2);
             }
         }
 
         for (int i = 0; i < snakes[1].length; i++) {
-            if (point_have_same_coord(&snakes[1].points[i],&snakes[0].points[0])) {
-                printf("Snake 2 collides snake 1\r\n");
+            if (points_have_same_coord(&snakes[1].points[i],&snakes[0].points[0])) {
                 snakes[0].lives--;
                 if (snakes[0].lives > 0) reset_snake(1);
             }
@@ -210,15 +200,10 @@ void update_game() {
     // Ajout d'obstacles toutes les 5 secondes
     if (SDL_GetTicks() - last_obstacle_time > OBSTACLE_INTERVAL) {
         if (num_obstacles < MAX_OBSTACLES) {
-            obstacles[num_obstacles].x = rand() % (WIDTH / TILE_SIZE);
-            obstacles[num_obstacles].y = rand() % (HEIGHT / TILE_SIZE);
-            num_obstacles++;
+            world_add_new_obstacle();
         }
         last_obstacle_time = SDL_GetTicks();
     }
 }
 
-void print_snake_info(snake_t *s, int num){
-    printf("Snake %d : (%02d:%02d) | \r\n",num,s->points[0].x,s->points[0].y);
-}
 

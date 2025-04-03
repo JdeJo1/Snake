@@ -98,12 +98,6 @@ void show_end_screen(){
                 if (event.type == SDL_QUIT) {
                     running = false;
                 } else if (event.type == SDL_KEYDOWN) {
-                    if (event.key.keysym.sym == SDLK_r || event.key.keysym.sym == SDLK_DOWN) {
-                        replay();                   
-                    }
-                    if (event.key.keysym.sym == SDLK_e) {
-                        quit();   
-                    }
                     if (event.key.keysym.sym == SDLK_RIGHT) {
                         if(selection<1){
                             selection++;

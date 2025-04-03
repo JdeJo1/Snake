@@ -27,6 +27,5 @@ bool snake_autocollides(snake_t *s);
 void snake_refresh_eating(snake_t *s);
 
 void update_game();
-void print_snake_info(snake_t *s, int num);
 
 #endif

@@ -8,6 +8,6 @@ typedef struct {
     int x, y;
 } Point;
 
-bool point_have_same_coord(Point *p1, Point *p2);
+bool points_have_same_coord(Point *p1, Point *p2);
 
 #endif
