@@ -4,7 +4,7 @@
 #define TILE_SIZE 20
 #define SNAKE_MAX_LENGTH 100
 #define OBSTACLE_INTERVAL 5000
-#define MAX_OBSTACLES 10
+#define MAX_OBSTACLES 40
 
 
 

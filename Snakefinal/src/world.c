@@ -86,11 +86,38 @@ void fruit_renew_coord(){
 }
 
 void world_add_new_obstacle(){
+    bool conflict=false;
     obstacles[num_obstacles].x = rand() % (WIDTH / TILE_SIZE);
     obstacles[num_obstacles].y = rand() % (HEIGHT / TILE_SIZE);
     if(points_have_same_coord(&fruit,&obstacles[num_obstacles])){
+        conflict=true;
+    }
+    else{
+        Point spawn_points[]={(Point){(WIDTH / TILE_SIZE) / 4,(HEIGHT / TILE_SIZE) / 2},(Point){(WIDTH / TILE_SIZE) * 3 / 4,(HEIGHT / TILE_SIZE) / 2}};
+        Point test_point;
+        
+        for(int i=0; i<2; i++){
+            for(int j=-2; j<=2; j++){
+                test_point=(Point){spawn_points[i].x+j,spawn_points[0].y};
+                if(points_have_same_coord(&obstacles[num_obstacles],&test_point)){
+                    conflict=true;
+                    break;
+                }
+                test_point=(Point){spawn_points[i].x,spawn_points[0].y+j};
+                if(points_have_same_coord(&obstacles[num_obstacles],&test_point)){
+                    conflict=true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    if(conflict){
         world_add_new_obstacle();
     }
-    num_obstacles++;
+    else{
+        num_obstacles++;
+    }
+    
     
 }
