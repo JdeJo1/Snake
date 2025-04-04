@@ -14,6 +14,7 @@
 extern SDL_Texture *screenshot;
 
 extern int WIDTH;
+extern int HEADER_HEIGHT;
 extern int HEIGHT;
 
 extern int num_obstacles;

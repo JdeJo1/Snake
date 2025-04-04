@@ -103,7 +103,7 @@ void init_SDL()
     TTF_Init();             // Initialisation de SDL_ttf
     IMG_Init(IMG_INIT_PNG); // Initialisation de SDL_image
 
-    window = SDL_CreateWindow("Snake SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Snake SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT+HEADER_HEIGHT, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);
 

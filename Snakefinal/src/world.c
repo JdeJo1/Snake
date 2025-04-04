@@ -5,6 +5,7 @@
 
 int WIDTH = 920;
 int HEIGHT = 920;
+int HEADER_HEIGHT=40;
 
 int num_obstacles = 0;
 
@@ -25,7 +26,7 @@ const Uint32 MOVE_DELAY = 100; // Délai entre les déplacements en milliseconde
 void draw_snake_rect(snake_t *s){
     if(s->lives>0){
         for (int i = 0; i < s->length; i++) {
-            SDL_Rect snakeRect = {s->points[i].x * TILE_SIZE, s->points[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+            SDL_Rect snakeRect = {s->points[i].x * TILE_SIZE, HEADER_HEIGHT+s->points[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
             SDL_RenderFillRect(renderer, &snakeRect);
         }
     }
@@ -36,16 +37,20 @@ void draw_game() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Fond noir
     SDL_RenderClear(renderer);
 
+    SDL_Rect header_rect=(SDL_Rect){0,0,WIDTH,HEADER_HEIGHT};
+    SDL_SetRenderDrawColor(renderer,127,127,127,255);
+    SDL_RenderFillRect(renderer,&header_rect);
+
     // Dessiner le fruit
     if (fruitTexture) {
-        SDL_Rect fruitRect = {fruit.x * TILE_SIZE, fruit.y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+        SDL_Rect fruitRect = {fruit.x * TILE_SIZE, HEADER_HEIGHT+fruit.y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
         SDL_RenderCopy(renderer, fruitTexture, NULL, &fruitRect);
     }
 
     // Dessiner les obstacles
     if (obstacleTexture) {
         for (int i = 0; i < num_obstacles; i++) {
-            SDL_Rect obstacleRect = {obstacles[i].x * TILE_SIZE, obstacles[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+            SDL_Rect obstacleRect = {obstacles[i].x * TILE_SIZE, HEADER_HEIGHT+obstacles[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
             SDL_RenderCopy(renderer, obstacleTexture, NULL, &obstacleRect);
         }
     }
@@ -64,7 +69,10 @@ void draw_game() {
     }
 
     // Afficher le score
-    if (playing&&scoreTexture) SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreRect);
+    if (playing&&scoreTexture){
+        SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreRect);
+        
+    }
 
     SDL_RenderPresent(renderer);
 }

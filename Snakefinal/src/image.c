@@ -50,14 +50,15 @@ void update_score_texture() {
     if (textSurface) {
         if (scoreTexture) SDL_DestroyTexture(scoreTexture); // Supprime l'ancienne texture
         scoreTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-        scoreRect = (SDL_Rect){20, 20, textSurface->w, textSurface->h}; // Position en haut à gauche
+        scoreRect = (SDL_Rect){20,0, textSurface->w, textSurface->h}; // Position en haut à gauche
+        rect_resize(&scoreRect,0,HEADER_HEIGHT);
         SDL_FreeSurface(textSurface);
     }
 }
 
 //Retourne un pointeur vers une texture issue d'une capture de la fenêtre
 SDL_Texture *get_screenshot_texture(){
-    SDL_Surface *sshot = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+    SDL_Surface *sshot = SDL_CreateRGBSurface(0, WIDTH, HEIGHT+HEADER_HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
     SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
     SDL_Texture *sshotTxtr=SDL_CreateTextureFromSurface(renderer,sshot);
     return sshotTxtr;
@@ -80,4 +81,26 @@ void renderer_print_text(SDL_Rect *r,SDL_Color c, char *txt){
     SDL_RenderCopy(renderer, rb_texture, NULL, r);
     SDL_FreeSurface(rb_surf);
     SDL_DestroyTexture(rb_texture);
+}
+
+void rect_resize(SDL_Rect *r, int w, int h){
+    int nw=0;
+    int nh=0;
+    if((w>0)||(h>0)){
+        if(w==0){
+            nw=r->w*h/r->h;
+            nh=h;
+        }
+        else if(h==0){
+            nh=r->h*w/r->w;
+            nw=w;
+        }
+        else{
+            nh=h;
+            nw=w;
+        }
+        r->w=nw;
+        r->h=nh;
+    }
+
 }

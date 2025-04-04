@@ -31,4 +31,6 @@ SDL_Texture *get_screenshot_texture();
 void rectblock_draw(rectBlock_t *rb);
 void rectblock_draw_with_text(rectBlock_t *rb,char *txt);
 void renderer_print_text(SDL_Rect *r,SDL_Color c, char *txt);
+
+void rect_resize(SDL_Rect *r, int w, int h);
 #endif
