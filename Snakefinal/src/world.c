@@ -26,8 +26,15 @@ const Uint32 MOVE_DELAY = 100; // Délai entre les déplacements en milliseconde
 void draw_snake_rect(snake_t *s){
     if(s->lives>0){
         for (int i = 0; i < s->length; i++) {
-            SDL_Rect snakeRect = {s->points[i].x * TILE_SIZE, HEADER_HEIGHT+s->points[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
-            SDL_RenderFillRect(renderer, &snakeRect);
+            if(s->body_texture){
+                SDL_Rect snakeRect = {s->points[i].x * TILE_SIZE-10, HEADER_HEIGHT+s->points[i].y * TILE_SIZE-10, TILE_SIZE*2, TILE_SIZE*2};
+                SDL_RenderCopy(renderer,s->body_texture,NULL,&snakeRect);
+            }
+            else{
+                SDL_Rect snakeRect = {s->points[i].x * TILE_SIZE, HEADER_HEIGHT+s->points[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+                SDL_RenderFillRect(renderer, &snakeRect);
+            }
+            
         }
     }
 }
@@ -51,6 +58,7 @@ void draw_game() {
     if (obstacleTexture) {
         for (int i = 0; i < num_obstacles; i++) {
             SDL_Rect obstacleRect = {obstacles[i].x * TILE_SIZE, HEADER_HEIGHT+obstacles[i].y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+
             SDL_RenderCopy(renderer, obstacleTexture, NULL, &obstacleRect);
         }
     }

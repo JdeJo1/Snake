@@ -18,13 +18,24 @@ extern SDL_Texture* obstacleTexture;
 extern SDL_Texture* logoTexture;
 extern SDL_Texture* scoreTexture;
 
+extern SDL_Texture* aboutTexture;
+
+extern SDL_Texture* bodyTexture;
+
+extern SDL_Texture* controllerTexture;
+
 // Variables pour l'affichage du score
 extern TTF_Font* font;
+extern TTF_Font* emojiFont;
 extern SDL_Color textColor; // Blanc
 
 void load_fruit_image();
+void load_controller_image();
 void load_obstacle_image();
 void load_logo_image();
+void load_body_image();
+void load_about_image();
+
 void update_score_texture();
 SDL_Texture *get_screenshot_texture();
 

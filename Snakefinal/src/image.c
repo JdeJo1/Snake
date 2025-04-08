@@ -3,12 +3,19 @@
 SDL_Texture* fruitTexture = NULL;
 SDL_Texture* obstacleTexture = NULL;
 
+SDL_Texture* controllerTexture=NULL;
+
 // Variable pour l'image du logo
 SDL_Texture* logoTexture = NULL;
 SDL_Texture* scoreTexture = NULL;
 
+SDL_Texture* aboutTexture = NULL;
+
+SDL_Texture* bodyTexture = NULL;
+
 // Variables pour l'affichage du score
 TTF_Font* font = NULL;
+TTF_Font* emojiFont = NULL;
 SDL_Color textColor = {255, 255, 255, 255}; // Blanc
 
 
@@ -35,6 +42,18 @@ void load_obstacle_image() {
         printf("Erreur chargement image obstacle : %s\n", IMG_GetError());
     }
 }
+void load_controller_image(){
+    controllerTexture = IMG_LoadTexture(renderer, "Snakefinal/cosmetiques/Commandes.png");
+    if (!controllerTexture) {
+        printf("Erreur chargement image obstacle : %s\n", IMG_GetError());
+    }
+}
+void load_about_image(){
+    aboutTexture = IMG_LoadTexture(renderer, "Snakefinal/cosmetiques/about.jpeg");
+    if (!aboutTexture) {
+        printf("Erreur chargement image obstacle : %s\n", IMG_GetError());
+    }
+}
 
 void update_score_texture() {
     char scoreText[100]; // pour éviter tout dépassement dz mémoire
@@ -53,6 +72,17 @@ void update_score_texture() {
         scoreRect = (SDL_Rect){20,0, textSurface->w, textSurface->h}; // Position en haut à gauche
         rect_resize(&scoreRect,0,HEADER_HEIGHT);
         SDL_FreeSurface(textSurface);
+    }
+}
+
+void load_body_image(){
+    snakes[0].body_texture = IMG_LoadTexture(renderer, "Snakefinal/cosmetiques/snake_body.png");
+    if (!snakes[0].body_texture) {
+        printf("Erreur chargement texture snake 0 %s\n", IMG_GetError());
+    }
+    snakes[1].body_texture = IMG_LoadTexture(renderer, "Snakefinal/cosmetiques/snake_body2.png");
+    if (!snakes[1].body_texture) {
+        printf("Erreur chargement texture snake 1 : %s\n", IMG_GetError());
     }
 }
 

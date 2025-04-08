@@ -11,6 +11,7 @@
 #include "image.h"
 #include "snake.h"
 #include "param.h"
+#include "about.h"
 
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
@@ -22,6 +23,7 @@ int sel_num_players=1;
 void show_main_menu() {
     SDL_Event event;
     bool menu_running = true;
+    bool about_selected=false;
     int selection = 1; // 1 joueur par défaut
 
     load_logo_image();
@@ -45,24 +47,31 @@ void show_main_menu() {
         SDL_Color colorSelected = {255, 255, 0, 255}; // Jaune si sélectionné
         SDL_Color colorNormal = {255, 255, 255, 255}; // Blanc normal
 
-        SDL_Surface* surface1 = TTF_RenderText_Solid(font, choix1, (selection == 1) ? colorSelected : colorNormal);
-        SDL_Surface* surface2 = TTF_RenderText_Solid(font, choix2, (selection == 2) ? colorSelected : colorNormal);
+        SDL_Surface* surface1 = TTF_RenderText_Solid(font, choix1, ((!about_selected)&&(selection == 1)) ? colorSelected : colorNormal);
+        SDL_Surface* surface2 = TTF_RenderText_Solid(font, choix2, ((!about_selected)&&(selection == 2)) ? colorSelected : colorNormal);
+        SDL_Surface* surface3 = TTF_RenderText_Blended_Wrapped(font,"A propos de snake", (about_selected) ? colorSelected : colorNormal,130);
         SDL_Texture* texture1 = SDL_CreateTextureFromSurface(renderer, surface1);
         SDL_Texture* texture2 = SDL_CreateTextureFromSurface(renderer, surface2);
+        SDL_Texture* texture3 = SDL_CreateTextureFromSurface(renderer, surface3);
 
         SDL_Rect rect1 = {WIDTH / 2 - surface1->w / 2, HEIGHT / 2 - surface1->h, surface1->w, surface1->h};
         SDL_Rect rect2 = {WIDTH / 2 - surface2->w / 2, HEIGHT / 2 + surface2->h, surface2->w, surface2->h};
+        SDL_Rect rect3 = {rect1.x+rect1.w+200,rect1.y, surface3->w, surface3->h};
 
         SDL_SetRenderDrawColor(renderer,0,0,0,127);
         SDL_RenderFillRect(renderer,&rect1);
         SDL_RenderFillRect(renderer,&rect2);
-        SDL_SetRenderDrawColor(renderer,255,255,(selection==1)?0:255,255);
+        SDL_RenderFillRect(renderer,&rect3);
+        SDL_SetRenderDrawColor(renderer,255,255,((!about_selected)&&(selection==1))?0:255,255);
         SDL_RenderDrawRect(renderer,&rect1);
-        SDL_SetRenderDrawColor(renderer,255,255,(selection==2)?0:255,255);
+        SDL_SetRenderDrawColor(renderer,255,255,((!about_selected)&&(selection==2))?0:255,255);
         SDL_RenderDrawRect(renderer,&rect2);
+        SDL_SetRenderDrawColor(renderer,255,255,(about_selected)?0:255,255);
+        SDL_RenderDrawRect(renderer,&rect3);
 
         SDL_RenderCopy(renderer, texture1, NULL, &rect1);
         SDL_RenderCopy(renderer, texture2, NULL, &rect2);
+        SDL_RenderCopy(renderer, texture3, NULL, &rect3);
 
         SDL_FreeSurface(surface1);
         SDL_FreeSurface(surface2);
@@ -80,8 +89,20 @@ void show_main_menu() {
                     selection = (selection == 1) ? 2 : 1;
                 }
                 if (event.key.keysym.sym == SDLK_RETURN) {
-                    sel_num_players = selection;
-                    menu_running = false;
+                    if(about_selected){
+                        draw_about_screen();
+                    }
+                    else{
+                        sel_num_players = selection;
+                        menu_running = false;
+                    }
+                    
+                }
+                if(event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_RIGHT){
+                    about_selected=!about_selected;
+                }
+                if (event.key.keysym.sym == SDLK_a) {
+                    draw_about_screen();
                 }
             }
         }
@@ -109,9 +130,15 @@ void init_SDL()
 
     // Charger la police
     font = TTF_OpenFont("Snakefinal/cosmetiques/Arial.ttf", 24);
+    emojiFont = TTF_OpenFont("Snakefinal/cosmetiques/NotoColorEmoji.ttf", 24);
     if (!font)
     {
         printf("Erreur chargement police : %s\n", TTF_GetError());
+        running = false;
+    }
+    if (!emojiFont)
+    {
+        printf("Erreur chargement police EMOJI : %s\n", TTF_GetError());
         running = false;
     }
 }
@@ -121,6 +148,9 @@ int main()
     init_SDL();
     load_fruit_image();
     load_obstacle_image();
+    load_controller_image();
+    load_body_image();
+    load_about_image();
     show_main_menu();
 
     srand(time(NULL));

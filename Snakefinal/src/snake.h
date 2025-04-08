@@ -14,6 +14,7 @@ typedef struct snake_s
     char direction;
     Point points[SNAKE_MAX_LENGTH];
     int length, lives, score;
+    SDL_Texture *body_texture;
 }snake_t;
 
 extern snake_t snakes[];
