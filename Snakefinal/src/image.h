@@ -5,6 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include "world.h"
+#include "about.h"
 
 typedef struct rectBlock_s{
     SDL_Rect *rect;
@@ -35,6 +36,8 @@ void load_obstacle_image();
 void load_logo_image();
 void load_body_image();
 void load_about_image();
+
+void load_button_texture();
 
 void update_score_texture();
 SDL_Texture *get_screenshot_texture();

@@ -7,6 +7,7 @@
 
 #include "world.h"
 #include "snake.h"
+#include "image.h"
 
 void play_game();
 void show_end_screen();

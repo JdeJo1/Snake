@@ -49,34 +49,51 @@ void show_main_menu() {
 
         SDL_Surface* surface1 = TTF_RenderText_Solid(font, choix1, ((!about_selected)&&(selection == 1)) ? colorSelected : colorNormal);
         SDL_Surface* surface2 = TTF_RenderText_Solid(font, choix2, ((!about_selected)&&(selection == 2)) ? colorSelected : colorNormal);
-        SDL_Surface* surface3 = TTF_RenderText_Blended_Wrapped(font,"A propos de snake", (about_selected) ? colorSelected : colorNormal,130);
+        
         SDL_Texture* texture1 = SDL_CreateTextureFromSurface(renderer, surface1);
         SDL_Texture* texture2 = SDL_CreateTextureFromSurface(renderer, surface2);
-        SDL_Texture* texture3 = SDL_CreateTextureFromSurface(renderer, surface3);
+        
 
         SDL_Rect rect1 = {WIDTH / 2 - surface1->w / 2, HEIGHT / 2 - surface1->h, surface1->w, surface1->h};
         SDL_Rect rect2 = {WIDTH / 2 - surface2->w / 2, HEIGHT / 2 + surface2->h, surface2->w, surface2->h};
-        SDL_Rect rect3 = {rect1.x+rect1.w+200,rect1.y, surface3->w, surface3->h};
+        
 
         SDL_SetRenderDrawColor(renderer,0,0,0,127);
         SDL_RenderFillRect(renderer,&rect1);
         SDL_RenderFillRect(renderer,&rect2);
-        SDL_RenderFillRect(renderer,&rect3);
         SDL_SetRenderDrawColor(renderer,255,255,((!about_selected)&&(selection==1))?0:255,255);
         SDL_RenderDrawRect(renderer,&rect1);
         SDL_SetRenderDrawColor(renderer,255,255,((!about_selected)&&(selection==2))?0:255,255);
         SDL_RenderDrawRect(renderer,&rect2);
-        SDL_SetRenderDrawColor(renderer,255,255,(about_selected)?0:255,255);
-        SDL_RenderDrawRect(renderer,&rect3);
-
+        
         SDL_RenderCopy(renderer, texture1, NULL, &rect1);
         SDL_RenderCopy(renderer, texture2, NULL, &rect2);
-        SDL_RenderCopy(renderer, texture3, NULL, &rect3);
-
+        
         SDL_FreeSurface(surface1);
         SDL_FreeSurface(surface2);
         SDL_DestroyTexture(texture1);
         SDL_DestroyTexture(texture2);
+
+        if(aboutButtonNormalTexture&&aboutButtonSelectedTexture){
+            SDL_Rect rect3 = {WIDTH-100,0, 100, 100};
+            SDL_RenderCopy(renderer,(about_selected)? aboutButtonSelectedTexture:aboutButtonNormalTexture, NULL, &rect3);
+        }
+        else{
+
+            SDL_Surface* surface3 = TTF_RenderText_Blended_Wrapped(font,"A propos de snake", (about_selected) ? colorSelected : colorNormal,130);
+            SDL_Texture* texture3 = SDL_CreateTextureFromSurface(renderer, surface3);
+            SDL_Rect rect3 = {rect1.x+rect1.w+200,rect1.y, surface3->w, surface3->h};
+
+            SDL_SetRenderDrawColor(renderer,0,0,0,127);
+            SDL_RenderFillRect(renderer,&rect3);
+            SDL_SetRenderDrawColor(renderer,255,255,(about_selected)?0:255,255);
+            SDL_RenderDrawRect(renderer,&rect3);
+
+            SDL_RenderCopy(renderer, texture3, NULL, &rect3);
+            
+            SDL_FreeSurface(surface3);
+            SDL_DestroyTexture(texture3);
+        }
 
         SDL_RenderPresent(renderer);
 
@@ -151,6 +168,8 @@ int main()
     load_controller_image();
     load_body_image();
     load_about_image();
+    load_button_texture();
+
     show_main_menu();
 
     srand(time(NULL));

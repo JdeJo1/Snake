@@ -75,12 +75,8 @@ void show_end_screen(){
             rect.y=(HEIGHT+HEADER_HEIGHT-rect.h)/2;
             rectblock_draw_with_text(&go_rb,"GAME OVER");
             
-            rep_rb.fillColor=(SDL_Color){0,(selection==1)?255:0,0,(selection==1)?255:127};
-            rep_rb.drawColor=(SDL_Color){(selection==1)?255:0,255,(selection==1)?255:0,255};
-            rep_rb.rect=&rect;
-            rect.x=(3*WIDTH-2*rect.w)/4;
-            rect.y=3*(HEIGHT+HEADER_HEIGHT)/4;
-            rectblock_draw_with_text(&rep_rb,"REPLAY");
+            
+            
 
             quit_rb.fillColor=(SDL_Color){(selection==0)?255:0,0,0,(selection==0)?255:127};
             quit_rb.drawColor=(SDL_Color){255,(selection==0)?255:0,(selection==0)?255:0,255};
@@ -88,6 +84,13 @@ void show_end_screen(){
             rect.x=(WIDTH-2*rect.w)/4;
             rect.y=3*(HEIGHT+HEADER_HEIGHT)/4;
             rectblock_draw_with_text(&quit_rb,"QUIT");
+
+            rep_rb.fillColor=(SDL_Color){0,(selection==1)?255:0,0,(selection==1)?255:127};
+	rep_rb.drawColor=(SDL_Color){(selection==1)?255:0,255,(selection==1)?255:0,255};
+	rep_rb.rect=&rect;
+	rect.x=(3*WIDTH-2*rect.w)/4;
+	rect.y=3*(HEIGHT+HEADER_HEIGHT)/4;
+	rectblock_draw_with_text(&rep_rb,"REPLAY");
 
             display_scores();
 

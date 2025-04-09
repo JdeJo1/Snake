@@ -86,6 +86,21 @@ void load_body_image(){
     }
 }
 
+void load_button_texture(){
+    aboutButtonNormalTexture = IMG_LoadTexture(renderer, "Snakefinal/cosmetiques/ABOUT/normal.png");
+    if (!aboutButtonNormalTexture) {
+        printf("Erreur chargement texture bouton \"A propos\" à l'état normal : %s\n", IMG_GetError());
+    }
+    aboutButtonSelectedTexture = IMG_LoadTexture(renderer, "Snakefinal/cosmetiques/ABOUT/selected.png");
+    if (!aboutButtonSelectedTexture) {
+        printf("Erreur chargement texture bouton \"A propos\" à l'état sélectionné : %s\n", IMG_GetError());
+    }
+    returnButtonTexture = IMG_LoadTexture(renderer, "Snakefinal/cosmetiques/RETURN/selected.png");
+    if (!returnButtonTexture) {
+        printf("Erreur chargement texture bouton de retour : %s\n", IMG_GetError());
+    }    
+}
+
 //Retourne un pointeur vers une texture issue d'une capture de la fenêtre
 SDL_Texture *get_screenshot_texture(){
     SDL_Surface *sshot = SDL_CreateRGBSurface(0, WIDTH, HEIGHT+HEADER_HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
